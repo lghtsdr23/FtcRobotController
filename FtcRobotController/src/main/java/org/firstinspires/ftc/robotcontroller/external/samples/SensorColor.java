@@ -167,20 +167,7 @@ public class SensorColor extends LinearOpMode {
       // not during the loop)
       colorSensor.setGain(gain);
 
-      // Check the status of the X button on the gamepad
-      xButtonCurrentlyPressed = gamepad1.x;
 
-      // If the button state is different than what it was, then act
-      if (xButtonCurrentlyPressed != xButtonPreviouslyPressed) {
-        // If the button is (now) down, then toggle the light
-        if (xButtonCurrentlyPressed) {
-          if (colorSensor instanceof SwitchableLight) {
-            SwitchableLight light = (SwitchableLight)colorSensor;
-            light.enableLight(!light.isLightOn());
-          }
-        }
-      }
-      xButtonPreviouslyPressed = xButtonCurrentlyPressed;
 
       // Get the normalized colors from the sensor
       NormalizedRGBA colors = colorSensor.getNormalizedColors();
@@ -203,12 +190,6 @@ public class SensorColor extends LinearOpMode {
               .addData("Value", "%.3f", hsvValues[2]);
       telemetry.addData("Alpha", "%.3f", colors.alpha);
 
-      /* If this color sensor also has a distance sensor, display the measured distance.
-       * Note that the reported distance is only useful at very close range, and is impacted by
-       * ambient light and surface reflectivity. */
-      if (colorSensor instanceof DistanceSensor) {
-        telemetry.addData("Distance (cm)", "%.3f", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM));
-      }
 
       telemetry.update();
 
