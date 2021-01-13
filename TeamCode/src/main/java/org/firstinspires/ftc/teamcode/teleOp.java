@@ -39,7 +39,12 @@ public class TELEOP extends LinearOpMode {
     DcMotor LeftRear;
     DcMotor RightFront;
     DcMotor RightRear;
-    NormalizedColorSensor colorSensor;
+    DcMotor Intake;
+    DcMotor Launcher;
+    DcMotor Hopper;
+    DcMotor Wobble;
+    Servo Loader;
+
 
     /** The relativeLayout field is used to aid in providing interesting visual feedback
      * in this sample application; you probably *don't* need this when you use a color sensor on your
@@ -53,41 +58,17 @@ public class TELEOP extends LinearOpMode {
         LeftRear = hardwareMap.dcMotor.get("MotorLeftRear");
         RightFront = hardwareMap.dcMotor.get("MotorRightFront");
         RightRear = hardwareMap.dcMotor.get("MotorRightRear");
+        Intake = hardwareMap.dcMotor.get("MotorIntake");
+        Launcher = hardwareMap.dcMotor.get("MotorLauncher");
+        Hopper = hardwareMap.dcMotor.get("MotorHopper");
+        Wobble = hardwareMap.dcMotor.get("MotorWobble");
+
+        Loader = hardwareMap.servo.get("MotorLoader");
 
         RightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         RightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
-            // You can give the sensor a gain value, will be multiplied by the sensor's raw value before the
-            // normalized color values are calculated. Color sensors (especially the REV Color Sensor V3)
-            // can give very low values (depending on the lighting conditions), which only use a small part
-            // of the 0-1 range that is available for the red, green, and blue values. In brighter conditions,
-            // you should use a smaller gain than in dark conditions. If your gain is too high, all of the
-            // colors will report at or near 1, and you won't be able to determine what color you are
-            // actually looking at. For this reason, it's better to err on the side of a lower gain
-            // (but always greater than  or equal to 1).
-            float gain = 2;
 
-            // Once per loop, we will update this hsvValues array. The first element (0) will contain the
-            // hue, the second element (1) will contain the saturation, and the third element (2) will
-            // contain the value. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
-            // for an explanation of HSV color.
-            final float[] hsvValues = new float[3];
-
-            // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
-            // state of the X button on the gamepad
-            boolean xButtonPreviouslyPressed = false;
-            boolean xButtonCurrentlyPressed = false;
-
-            // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
-            // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
-            // the values you get from ColorSensor are dependent on the specific sensor you're using.
-            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
-
-            // If possible, turn the light on in the beginning (it might already be on anyway,
-            // we just make sure it is if we can).
-            if (colorSensor instanceof SwitchableLight) {
-                ((SwitchableLight)colorSensor).enableLight(true);
-            }
         //waitForStart();
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("status", "waiting for start command...");
@@ -97,12 +78,7 @@ public class TELEOP extends LinearOpMode {
 
 
         }
-        // printIng out the encoder counts
-        telemetry.addData(" Left Front DRIVING TO: %7d ", LeftFront.getCurrentPosition());
 
-        telemetry.addData("Left Rear DRIVING TO: %7d ", LeftRear.getCurrentPosition());
-        telemetry.addData("Right Rear DRIVING TO: %7d ", RightRear.getCurrentPosition());
-        telemetry.update();
 
         while (opModeIsActive()) {
 
@@ -112,54 +88,36 @@ public class TELEOP extends LinearOpMode {
                 LeftFront.setPower(gamepad1.left_stick_y * 1 + gamepad1.left_stick_x * -1 + gamepad1.right_stick_x * -1);
                 RightFront.setPower(gamepad1.left_stick_y * 1 + gamepad1.left_stick_x * 1 + gamepad1.right_stick_x * 1);
                 RightRear.setPower(gamepad1.left_stick_y * 1 + gamepad1.left_stick_x * -1 + gamepad1.right_stick_x * 1);
-                sleep(345);
-                          }
+
+
+            }
+
             //Gamepad 1 left joystick x strafe
            LeftFront.setPower(0);
             RightFront.setPower(0);
             RightRear.setPower(0);
             LeftRear.setPower(0);
-//            // Explain basic gain information via telemetry
-//            telemetry.addLine("Hold the A button on gamepad 1 to increase gain, or B to decrease it.\n");
-//            telemetry.addLine("Higher gain values mean that the sensor will report larger numbers for Red, Green, and Blue, and Value\n");
-//
-//            // Update the gain value if either of the A or B gamepad buttons is being held
-//            if (gamepad1.a) {
-//                // Only increase the gain by a small amount, since this loop will occur multiple times per second.
-//                gain += 0.005;
-//            } else if (gamepad1.b && gain > 1) { // A gain of less than 1 will make the values smaller, which is not helpful.
-//                gain -= 0.005;
-//            }
-//
-//            // Show the gain value via telemetry
-//            telemetry.addData("Gain", gain);
-//
-//            // Tell the sensor our desired gain value (normally you would do this during initialization,
-//            // not during the loop)
-//            colorSensor.setGain(gain);
-//
-//
-//
-//            // Get the normalized colors from the sensor
-//            NormalizedRGBA colors = colorSensor.getNormalizedColors();
-//
-//
-//            // Update the hsvValues array by passing it to Color.colorToHSV()
-//            Color.colorToHSV(colors.toColor(), hsvValues);
-//
-//            telemetry.addLine()
-//                    .addData("Red", "%.3f", colors.red)
-//                    .addData("Green", "%.3f", colors.green)
-//                    .addData("Blue", "%.3f", colors.blue);
-//            telemetry.addLine()
-//                    .addData("Hue", "%.3f", hsvValues[0])
-//                    .addData("Saturation", "%.3f", hsvValues[1])
-//                    .addData("Value", "%.3f", hsvValues[2]);
-//            telemetry.addData("Alpha", "%.3f", colors.alpha);
-//
-//
-//            telemetry.update();
-//
+            if (gamepad2.left_bumper){
+                Loader.setPosition(.97);
+            }
+            if (gamepad2.right_bumper){
+                Loader.setPosition(.77);
+            }
+            if (gamepad2.dpad_up){
+                Launcher.setPower(-.55);
+            }
+            if (gamepad2.dpad_down){
+                Launcher.setPower(0);
+            }
+            if(gamepad2.a){// stop
+                Intake.setPower(0.0);
+            }
+            if(gamepad2.x){// reverse
+                Intake.setPower(-1.0);
+            }
+            if(gamepad2.b){// forward
+                Intake.setPower(1.0);
+            }
 
 
             idle();

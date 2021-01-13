@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name = "blue close")
-public class pointa_blueclose extends LinearOpMode {
+@Autonomous(name = "blue middle")
+public class bluemiddle  extends LinearOpMode {
     DcMotor LeftFront;
     DcMotor LeftRear;
     DcMotor RightFront;
