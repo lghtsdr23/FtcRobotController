@@ -105,6 +105,7 @@ public class TELEOP extends LinearOpMode {
                 sleep(434);
                 Loader.setPosition(.96);
             }
+            //launcher
             if (gamepad1.y){
                 Launcher.setPower(.63);
 
