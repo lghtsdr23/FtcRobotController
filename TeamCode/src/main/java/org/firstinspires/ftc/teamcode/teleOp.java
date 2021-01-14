@@ -44,6 +44,7 @@ public class TELEOP extends LinearOpMode {
     DcMotor Hopper;
     DcMotor Wobble;
     Servo Loader;
+    Servo intakerelease;
 
 
     /** The relativeLayout field is used to aid in providing interesting visual feedback
@@ -64,6 +65,7 @@ public class TELEOP extends LinearOpMode {
         Wobble = hardwareMap.dcMotor.get("MotorWobble");
 
         Loader = hardwareMap.servo.get("MotorLoader");
+        intakerelease = hardwareMap.servo.get("intakerelease");
 
         RightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         RightRear.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -97,26 +99,38 @@ public class TELEOP extends LinearOpMode {
             RightFront.setPower(0);
             RightRear.setPower(0);
             LeftRear.setPower(0);
-            if (gamepad2.left_bumper){
-                Loader.setPosition(.97);
-            }
+
             if (gamepad2.right_bumper){
                 Loader.setPosition(.77);
+                sleep(434);
+                Loader.setPosition(.96);
             }
-            if (gamepad2.dpad_up){
-                Launcher.setPower(-.55);
+            if (gamepad1.y){
+                Launcher.setPower(.63);
+
             }
-            if (gamepad2.dpad_down){
+            if (gamepad1.a){
                 Launcher.setPower(0);
             }
-            if(gamepad2.a){// stop
+            if(gamepad2.b){// stop
                 Intake.setPower(0.0);
             }
-            if(gamepad2.x){// reverse
+            if(gamepad2.y){// reverse
                 Intake.setPower(-1.0);
             }
-            if(gamepad2.b){// forward
+            if(gamepad2.a){// forward
                 Intake.setPower(1.0);
+            }
+            if (gamepad2.dpad_left){
+                Hopper.setPower(-.45);
+
+            }
+
+            if (gamepad2.x){
+                Hopper.setPower(0);
+            }
+            if (gamepad2.dpad_right){
+                intakerelease.setPosition(.36);
             }
 
 
