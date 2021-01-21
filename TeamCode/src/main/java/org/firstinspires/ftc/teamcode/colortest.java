@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Autonomous(name = "colorsensorsp", group = "TeleOp")
-
+@Disabled
 public class colortest extends LinearOpMode {
     DcMotor LeftFront;
     DcMotor LeftRear;

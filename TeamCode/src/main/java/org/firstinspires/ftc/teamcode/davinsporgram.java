@@ -1,6 +1,7 @@
         package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 
 @Autonomous(name="Autonomous Program", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class davinsporgram extends LinearOpMode {
 
     //region Declaring Motors

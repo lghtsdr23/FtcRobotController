@@ -1,142 +1,258 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "red far color")
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+
+@Autonomous(name = "RED middlcome")
 @Disabled
-public class redcolor extends LinearOpMode {
+public class redmiddlecomment extends LinearOpMode {
+
+    // Motor Declaration
     DcMotor LeftFront;
     DcMotor LeftRear;
     DcMotor RightFront;
     DcMotor RightRear;
-    NormalizedColorSensor colorSensor;
-    // Gobilda Motor Specs
+    DcMotor Intake;
+    DcMotor Launcher;
+    DcMotor Hopper;
+    DcMotor Wobble;
+    Servo Loader;
+    Servo intakerelease;
+    Servo gripper;
+      // Gobilda Motor Specs
+    // Where is this number from?  _____________________________________
     double COUNTS_PER_MOTOR_GOBUILDA = 706;    // gobilda
-    double DRIVE_GEAR_REDUCTION = .66;    // 1:1
+    double DRIVE_GEAR_REDUCTION = 1;    // 1:1
+    // Should this be 9.6 cm?  ____________________________________________
+    //TODO look up wheel diameter on wheels!
     double WHEEL_DIAMETER_CM = 10;     // mecanum wheels
 
+    // Why divide by 2?  ___look into equation________
     double COUNTS_PER_CM_GOBUILDA = ((COUNTS_PER_MOTOR_GOBUILDA * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_CM * Math.PI)) / 2;
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
+    private static final String VUFORIA_KEY =
+            "ARCqabf/////AAABmSZ0wCx5pkN9gr0iWwVr7nMSv8dNn49XZv9+SuCY8CXlSs7do7TvoCHOTxqs/CMQyBaw1+pT8rdDN0FKyl5Ap4zlogqXslDSNAGclnsVNeXhcGb5Hf53rNWKPFselj4XpjzWVewj3GvmqeB3HStCAvWPwP1yjUf0e6I1p7SRs/IknkADhosUfsuMfGHgHEDPancZYTZuomf7aEiKXkvDeBuz1mA7IQJeQnp2Sw6kvGLqmxzgdCw6GpcJevSThLxm+Wt6AlYealSqWGLUjoAr58+PwbNeIE/h+knnbmH5O5KyKDmlYxUBne9T/MYN+2lVZmM7zY/9J5I39oHhl3q/aWC0rTOI9cLgT77kEyWU+UAM";
+
+    private VuforiaLocalizer vuforia;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
+     * Detection engine.
+     */
+    private TFObjectDetector tfod;
+
 
     @Override
     public void runOpMode() {
-
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+        initTfod();
         //defining motors
         LeftFront = hardwareMap.dcMotor.get("MotorLeftFront");
         LeftRear = hardwareMap.dcMotor.get("MotorLeftRear");
         RightFront = hardwareMap.dcMotor.get("MotorRightFront");
         RightRear = hardwareMap.dcMotor.get("MotorRightRear");
+        Intake = hardwareMap.dcMotor.get("MotorIntake");
+        Launcher = hardwareMap.dcMotor.get("MotorLauncher");
+        Hopper = hardwareMap.dcMotor.get("MotorHopper");
+        Wobble = hardwareMap.dcMotor.get("MotorWobble");
+        gripper = hardwareMap.servo.get("gripper");
+        Loader = hardwareMap.servo.get("MotorLoader");
+        intakerelease = hardwareMap.servo.get("intakerelease");
         // reversing motors
         LeftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         LeftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        float gain = 4;
 
-        // Once per loop, we will update this hsvValues array. The first element (0) will contain the
-        // hue, the second element (1) will contain the saturation, and the third element (2) will
-        // contain the value. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
-        // for an explanation of HSV color.
-        final float[] hsvValues = new float[3];
-
-        // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
-        // state of the X button on the gamepad
-        boolean xButtonPreviouslyPressed = false;
-        boolean xButtonCurrentlyPressed = false;
-
-        // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
-        // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
-        // the values you get from ColorSensor are dependent on the specific sensor you're using.
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
-
-        // If possible, turn the light on in the beginning (it might already be on anyway,
-        // we just make sure it is if we can).
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight)colorSensor).enableLight(true);
-        }
+        // Started out with constants and then changed to using the actual values in the command.  Harder to maintain
+        gripper.setPosition(.97);
+        sleep(1000);
+        Wobble.setPower(.75);
+        sleep(623);
+        Wobble.setPower(0.14);
+        intakerelease.setPosition(.05);
         //waitForStart();
+
+        // Menu options would be helpful instead of multiple programs.  Changes could be easier.  If you need to add an
+        // options to the program it now requires multiple changes to multiple programs and multiple testing  ____________________
+
+        // Why use a while statement?  _______________________________
         while (!opModeIsActive() && !isStopRequested()) {
             telemetry.addData("status", "waiting for start command...");
             telemetry.update();
 
-        }
-        while (opModeIsActive()) {
-            colorSensor.setGain(gain);
+//              /**
+//         * Activate TensorFlow Object Detection before we wait for the start command.
+//         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+//         **/
+            if (tfod != null) {
+                tfod.activate();
 
-            // Get the normalized colors from the sensor
-            NormalizedRGBA colors = colorSensor.getNormalizedColors();
+                // The TensorFlow software will scale the input images from the camera to a lower resolution.
+                // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+                // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
+                // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+                // should be set to the value of the images used to create the TensorFlow Object Detection model
+                // (typically 1.78 or 16/9).
 
-
-            // Update the hsvValues array by passing it to Color.colorToHSV()
-            Color.colorToHSV(colors.toColor(), hsvValues);
-
-            strafeDriveEncoder(0.7, 105, "LEFT", 2.7);
-
-            straightDriveEncoder(0.4, 150, 3.2);
-
-            strafeDriveEncoder(.5, 75, "RIGHT", 3);
-
-            straightDriveEncoder(.3,-50,2);
-            straightDriveEncoder(.3,50,2);
-
-            // would be intake
-            double intakeamount = 2;
-            int intakeclipped = 2;
-            int intake = 2;
-            intakeamount = Range.clip(intakeclipped, 0, 2);
-            intake = (int) intakeamount;
-            switch (intake) {
-                case 0:
-                    if (!isStopRequested() && opModeIsActive()) {
-
-                        straightDriveEncoder(.2, 170, 3.3);
-                        strafeDriveEncoder(.2,46,"RIGHT",3);
-                        straightDriveEncoder(.2, -110, 3.2);
-                        while (colorSensor.getNormalizedColors().green > 0.9 ){
-                            LeftFront.setPower(-0.4);
-                            RightFront.setPower(-0.4);
-                            RightRear.setPower(-0.4);
-                            LeftRear.setPower(-0.4);
-                        }
-
-                        break;
-                    }
-
-                case 1:
-                    if (!isStopRequested() && opModeIsActive()) {
-
-                        straightDriveEncoder(.4, 90, 3.3);
-                        straightDriveEncoder(.4, -40, 3.2);
-                        while (colorSensor.getNormalizedColors().green > 0.9 ){
-                            LeftFront.setPower(-0.4);
-                            RightFront.setPower(-0.4);
-                            RightRear.setPower(-0.4);
-                            LeftRear.setPower(-0.4);
-                        }
-                        break;
-                    }
-
-                case 2:
-                    if (!isStopRequested() && opModeIsActive()) {
-                        strafeDriveEncoder(.5, 55, "RIGHT", 3.1);
-                        straightDriveEncoder(.4,28,3);
-                        break;
-                    }
-
-
+                // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
+                //tfod.setZoom(2.5, 1.78);
             }
 
+        }
 
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+        waitForStart();
+        String ring = "default";
+        int t = 0;
+        // Assume this series of statements are being used only once.  Why a while loop?  _________________________
+        while (opModeIsActive()) {
+            straightDriveEncoder(.6, 25, 2);
+            Hopper.setPower(-.45);
+            Launcher.setPower(.67);
+
+
+            while (t < 4 && opModeIsActive()) {
+                if (tfod != null) {
+                    // getUpdatedRecognitions() will return null if no new information is available since
+                    // the last time that call was made.
+
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                            ring = recognition.getLabel();
+                            // if you find an object use a break to break out of a loop.  incrementing t twice in the loop if an object is detected.  _________________________
+                            t = t + 1;
+
+                        }
+                        telemetry.update();
+                    }
+                }
+                t = t + 1;
+            }
+
+            // Good use of strafeDrivEncoder and straightDriveEncoder - program is easier to read.
+            // Could use constants instead of actual values.  Easier to change  ____________________________________
+            strafeDriveEncoder(0.7, 45, "LEFT", 2.7);
+            // First strafe after detection
+            straightDriveEncoder(0.7, 125, 2.5);
+            // Straight drive to white line
+          //  1/21/2020 changed time to 2.7 from 2.8
+            //GL
+            strafeDriveEncoder(.5, 55,   "RIGHT", 2.7);
+            Wobble.setPower(-0.1);
+            sleep(1000);
+            //TODO develop class called LOADERSHOOT
+            Loader.setPosition(.74);
+            sleep(434);
+            Loader.setPosition(.96);
+            sleep(2000);
+            Loader.setPosition(.74);
+            sleep(434);
+            Loader.setPosition(.96);
+            sleep(2000);
+            Loader.setPosition(.74);
+            sleep(434);
+            Loader.setPosition(.96);
+            sleep(500);
+            Launcher.setPower(0);
+            //TODO develop class called WobbleUp
+            Wobble.setPower(.75);
+            sleep(623);
+            Wobble.setPower(0.14);
+            telemetry.addData("ring", ring);
+            switch (ring) {
+                case "Quad":
+                    if (!isStopRequested() && opModeIsActive()) {
+                        telemetry.addLine("Quad");
+                        sleep(834);
+                        straightDriveEncoder(.6, 200, 3.5);
+                        strafeDriveEncoder(.3, 80, "RIGHT", 3.2);
+//                        straightDriveEncoder(.2, -130, 3.2);
+                        Wobble.setPower(-0.1);
+                        sleep(1200);
+                        gripper.setPosition(.46);
+                        straightDriveEncoder(.6, -150, 3.5);
+                        intakerelease.setPosition(.36);
+
+                        break;
+                    }
+
+                case "Single":
+                    if (!isStopRequested() && opModeIsActive()) {
+                        telemetry.addLine("One");
+                        strafeDriveEncoder(.4, 30, "RIGHT", 2.5);
+                        straightDriveEncoder(.6, 120, 3.6);
+//                        straightDriveEncoder(.4, -60, 3.2);
+                        Wobble.setPower(-0.1);
+                        sleep(1200);
+                        gripper.setPosition(.46);
+                        straightDriveEncoder(.6, -85, 3.5);
+
+                        intakerelease.setPosition(.36);
+                        break;
+                    }
+
+                case "None":
+                    if (!isStopRequested() && opModeIsActive()) {
+                        telemetry.addLine("None");
+                        strafeDriveEncoder(.5, 75, "RIGHT", 3.1);
+//                        straightDriveEncoder(.5,48,2);
+                        straightDriveEncoder(.5, 30, 3.2);
+                        Wobble.setPower(-0.1);
+                        sleep(1200);
+                        gripper.setPosition(.46);
+                        intakerelease.setPosition(.36);
+                        break;
+                    }
+
+                case "default":
+                    if (!isStopRequested() && opModeIsActive()) {
+                        telemetry.addLine("None");
+                        strafeDriveEncoder(.5, 75, "RIGHT", 3.1);
+                        straightDriveEncoder(.5, 40, 3.2);
+                        Wobble.setPower(-.05);
+                        sleep(2000);
+                        gripper.setPosition(.46);
+                        sleep(1000);
+                        Wobble.setPower(.65);
+                        sleep(623);
+                        Wobble.setPower(0.14);
+                        intakerelease.setPosition(.36);
+                        break;
+                    }
+                    break;
+            }
             break;
         }
+
+
     }
 
     public void straightDriveEncoder(double speed, double distanceCM, double timeCutOff) {
@@ -154,6 +270,7 @@ public class redcolor extends LinearOpMode {
 
         if (opModeIsActive()) {
 
+            // RESET_ENCODERS is deprecated.  Should use STOP_AND_RESET_ENCODERS  ___________________________________
             LeftFront.setMode(DcMotor.RunMode.RESET_ENCODERS);
             RightFront.setMode(DcMotor.RunMode.RESET_ENCODERS);
             LeftRear.setMode(DcMotor.RunMode.RESET_ENCODERS);
@@ -184,7 +301,7 @@ public class redcolor extends LinearOpMode {
             RightRear.setPower(Math.abs(speed));
 
             t = getRuntime();
-            end = getRuntime() + timeCutOff; //TODO THIS CAN BE AUTOMATED
+            end = getRuntime() + timeCutOff; //TODO THIS CAN BE AUTOMATED  - Why not automated?  _____________________________
 
             while (opModeIsActive() && !isStopRequested() &&
                     (getRuntime() <= end) &&
@@ -294,13 +411,13 @@ public class redcolor extends LinearOpMode {
         if (opModeIsActive()) {
 
             t = getRuntime();
-            end = timeCutOff + getRuntime();//TODO THIS CAN BE AUTOMATED
+            end = timeCutOff + getRuntime();//TODO THIS CAN BE AUTOMATED  ______________________________
 
             while (opModeIsActive() && !isStopRequested() &&
                     (getRuntime() <= end) &&
                     (LeftFront.isBusy() || RightFront.isBusy() || LeftRear.isBusy() || RightRear.isBusy())) {
 
-
+                // Planning to complete?  _______________________________________
                 //TODO this is where you can correct the robot while its driving
                 /*
                 Use parallel encoder to the direction in which your traveling
@@ -339,5 +456,32 @@ public class redcolor extends LinearOpMode {
 
         }
 
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 }
