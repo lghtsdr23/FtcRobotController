@@ -103,15 +103,7 @@ public class redmiddlecomment extends LinearOpMode {
             if (tfod != null) {
                 tfod.activate();
 
-                // The TensorFlow software will scale the input images from the camera to a lower resolution.
-                // This can result in lower detection accuracy at longer distances (> 55cm or 22").
-                // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
-                // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
-                // should be set to the value of the images used to create the TensorFlow Object Detection model
-                // (typically 1.78 or 16/9).
 
-                // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
-                //tfod.setZoom(2.5, 1.78);
             }
 
         }
@@ -123,8 +115,12 @@ public class redmiddlecomment extends LinearOpMode {
         waitForStart();
         String ring = "default";
         int t = 0;
-        // Assume this series of statements are being used only once.  Why a while loop?  _________________________
-        while (opModeIsActive()) {
+        /* 01.21.2021 10:27am GL
+            Changed while statement to an If statement to stop the possibility of a loop back
+
+        */
+
+        if (opModeIsActive()) {
             straightDriveEncoder(.6, 25, 2);
             Hopper.setPower(-.45);
             Launcher.setPower(.67);
@@ -162,9 +158,8 @@ public class redmiddlecomment extends LinearOpMode {
             strafeDriveEncoder(0.7, 45, "LEFT", 2.7);
             // First strafe after detection
             straightDriveEncoder(0.7, 125, 2.5);
-            // Straight drive to white line
-          //  1/21/2020 changed time to 2.7 from 2.8
-            //GL
+           /*   1/21/2021 GL changed time to 2.7 from 2.8
+                */
             strafeDriveEncoder(.5, 55,   "RIGHT", 2.7);
             Wobble.setPower(-0.1);
             sleep(1000);
@@ -194,7 +189,7 @@ public class redmiddlecomment extends LinearOpMode {
                         sleep(834);
                         straightDriveEncoder(.6, 200, 3.5);
                         strafeDriveEncoder(.3, 80, "RIGHT", 3.2);
-//                        straightDriveEncoder(.2, -130, 3.2);
+
                         Wobble.setPower(-0.1);
                         sleep(1200);
                         gripper.setPosition(.46);
@@ -209,32 +204,34 @@ public class redmiddlecomment extends LinearOpMode {
                         telemetry.addLine("One");
                         strafeDriveEncoder(.4, 30, "RIGHT", 2.5);
                         straightDriveEncoder(.6, 120, 3.6);
-//                        straightDriveEncoder(.4, -60, 3.2);
+
                         Wobble.setPower(-0.1);
                         sleep(1200);
                         gripper.setPosition(.46);
-                        straightDriveEncoder(.6, -85, 3.5);
+                        straightDriveEncoder(.6, -85, 3.2);
 
                         intakerelease.setPosition(.36);
                         break;
                     }
-
-                case "None":
-                    if (!isStopRequested() && opModeIsActive()) {
-                        telemetry.addLine("None");
-                        strafeDriveEncoder(.5, 75, "RIGHT", 3.1);
-//                        straightDriveEncoder(.5,48,2);
-                        straightDriveEncoder(.5, 30, 3.2);
-                        Wobble.setPower(-0.1);
-                        sleep(1200);
-                        gripper.setPosition(.46);
-                        intakerelease.setPosition(.36);
-                        break;
-                    }
+                    /* GL 1/21/21 GL
+                    Deleted none because it would never become used
+                     */
+//                case "None":
+//                    if (!isStopRequested() && opModeIsActive()) {
+//                        telemetry.addLine("None");
+//                        strafeDriveEncoder(.5, 75, "RIGHT", 3.1);
+////                        straightDriveEncoder(.5,48,2);
+//                        straightDriveEncoder(.5, 30, 3.2);
+//                        Wobble.setPower(-0.1);
+//                        sleep(1200);
+//                        gripper.setPosition(.46);
+//                        intakerelease.setPosition(.36);
+//                        break;
+//                    }
 
                 case "default":
                     if (!isStopRequested() && opModeIsActive()) {
-                        telemetry.addLine("None");
+                        telemetry.addLine("Default");
                         strafeDriveEncoder(.5, 75, "RIGHT", 3.1);
                         straightDriveEncoder(.5, 40, 3.2);
                         Wobble.setPower(-.05);
@@ -247,9 +244,9 @@ public class redmiddlecomment extends LinearOpMode {
                         intakerelease.setPosition(.36);
                         break;
                     }
-                    break;
+             break;
             }
-            break;
+
         }
 
 
@@ -270,11 +267,13 @@ public class redmiddlecomment extends LinearOpMode {
 
         if (opModeIsActive()) {
 
-            // RESET_ENCODERS is deprecated.  Should use STOP_AND_RESET_ENCODERS  ___________________________________
-            LeftFront.setMode(DcMotor.RunMode.RESET_ENCODERS);
-            RightFront.setMode(DcMotor.RunMode.RESET_ENCODERS);
-            LeftRear.setMode(DcMotor.RunMode.RESET_ENCODERS);
-            RightRear.setMode(DcMotor.RunMode.RESET_ENCODERS);
+          /*1/21/2021 GL
+          Changed Reset encoders to stop and reset encoders to help longevity of program
+           */
+            LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            LeftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            RightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             // Determine new target position, and pass to motor controller
             LeftFrontTarget = LeftFront.getCurrentPosition() + (int) (distanceCM * COUNTS_PER_CM_GOBUILDA);
@@ -301,7 +300,7 @@ public class redmiddlecomment extends LinearOpMode {
             RightRear.setPower(Math.abs(speed));
 
             t = getRuntime();
-            end = getRuntime() + timeCutOff; //TODO THIS CAN BE AUTOMATED  - Why not automated?  _____________________________
+            end = getRuntime() + timeCutOff;
 
             while (opModeIsActive() && !isStopRequested() &&
                     (getRuntime() <= end) &&
@@ -411,13 +410,13 @@ public class redmiddlecomment extends LinearOpMode {
         if (opModeIsActive()) {
 
             t = getRuntime();
-            end = timeCutOff + getRuntime();//TODO THIS CAN BE AUTOMATED  ______________________________
+            end = timeCutOff + getRuntime();
 
             while (opModeIsActive() && !isStopRequested() &&
                     (getRuntime() <= end) &&
                     (LeftFront.isBusy() || RightFront.isBusy() || LeftRear.isBusy() || RightRear.isBusy())) {
 
-                // Planning to complete?  _______________________________________
+
                 //TODO this is where you can correct the robot while its driving
                 /*
                 Use parallel encoder to the direction in which your traveling
