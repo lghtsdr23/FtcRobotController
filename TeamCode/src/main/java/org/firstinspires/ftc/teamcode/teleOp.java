@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
+@Disabled
 @TeleOp(name = "teleop", group = "TeleOp")
 
 public class TELEOP extends LinearOpMode {
@@ -72,13 +72,13 @@ public class TELEOP extends LinearOpMode {
 
                 if (gamepad2.right_bumper) {
                     Loader.setPosition(.68);
-                    sleep(204);
+                    sleep(304);
                     Loader.setPosition(.96);
 
                 }
                 //launcher
                 if (gamepad1.y) {
-                    Launcher.setVelocity(1175);
+                    Launcher.setVelocity(1165);
 
                 }
                 if (gamepad1.a) {
@@ -91,17 +91,21 @@ public class TELEOP extends LinearOpMode {
                     Intake.setPower(-0.9);
                 }
                 if (gamepad2.a) {// forward
-                    Intake.setPower(0.77);
+                    Intake.setPower(0.85);
                 }
                 if (gamepad2.left_bumper) {
-                    Hopper.setPower(-.65);
+                    Hopper.setPower(-1);
+                    sleep(600);
+                    Hopper.setPower(-0.07);
                     Intake.setPower(0);
 
                 }
 
                 if (gamepad2.x) {
+                    Hopper.setPower(1);
+                    sleep(600);
                     Hopper.setPower(0);
-                    Intake.setPower(.8);
+                    Intake.setPower(.85);
                 }
                 if (gamepad2.dpad_left) {
                     intakerelease.setPosition(.36);
@@ -129,11 +133,79 @@ public class TELEOP extends LinearOpMode {
                     gripper.setPosition(.65);
                 }
                 if (gamepad2.dpad_down){
-                    Launcher.setVelocity(1000);
+                    Launcher.setVelocity(975);
+                }
+
+
+
+
+                while (gamepad2.right_bumper) {
+                    Loader.setPosition(.70);
+                    sleep(404);
+                    Loader.setPosition(.96);
+
+                }
+                //launcher
+                if (gamepad1.y) {
+                    Launcher.setVelocity(1165);
+
+                }
+                if (gamepad1.a) {
+                    Launcher.setPower(0);
+                }
+                if (gamepad2.b) {// stop
+                    Intake.setPower(0.0);
+                }
+                if (gamepad2.y) {// reverse
+                    Intake.setPower(-0.9);
+                }
+                if (gamepad2.a) {// forward
+                    Intake.setPower(0.85);
+                }
+                if (gamepad2.left_bumper) {
+                    Hopper.setPower(-1);
+                    sleep(500);
+                    Hopper.setPower(-0.05);
+                    Intake.setPower(0);
+
+                }
+
+                if (gamepad2.x) {
+                    Hopper.setPower(1);
+                    sleep(500);
+                    Hopper.setPower(0);
+                    Intake.setPower(.85);
+                }
+                if (gamepad2.dpad_left) {
+                    intakerelease.setPosition(.36);
+                }
+                if (gamepad1.right_bumper){
+                    gripper.setPosition(.46);
+                }
+                if (gamepad1.left_bumper){
+                    gripper.setPosition(.96);
+                }
+                if (gamepad1.dpad_down){
+                    Wobble.setPower(.85);
+                    sleep(623);
+                    Wobble.setPower(0.14);
+                }
+                if (gamepad1.dpad_up){
+                    Wobble.setPower(-.65);
+                    sleep(423);
+                    Wobble.setPower(0);
+                }
+                if (gamepad1.x){
+                    Wobble.setPower(0);
+                }
+                if (gamepad1.b){
+                    gripper.setPosition(.65);
+                }
+                if (gamepad2.dpad_down){
+                    Launcher.setVelocity(975);
                 }
 
             }
-
             //Gamepad 1 left joystick x strafe
             LeftFront.setPower(0);
             RightFront.setPower(0);
@@ -141,14 +213,14 @@ public class TELEOP extends LinearOpMode {
             LeftRear.setPower(0);
 
             if (gamepad2.right_bumper) {
-                Loader.setPosition(.68);
-                sleep(204);
-                Loader.setPosition(.96);
+                Loader.setPosition(.70);
+                sleep(404);
+                Loader.setPosition(.97);
 
             }
             //launcher
             if (gamepad1.y) {
-                Launcher.setVelocity(1175);
+                Launcher.setVelocity(1092);
 
             }
             if (gamepad1.a) {
@@ -161,17 +233,19 @@ public class TELEOP extends LinearOpMode {
                 Intake.setPower(-0.9);
             }
             if (gamepad2.a) {// forward
-                Intake.setPower(0.77);
+                Intake.setPower(0.85);
             }
             if (gamepad2.left_bumper) {
-                Hopper.setPower(-.65);
+                Hopper.setPower(-1);
+                sleep(500);
+                Hopper.setPower(-0.07);
                 Intake.setPower(0);
-
             }
-
             if (gamepad2.x) {
+                Hopper.setPower(1);
+                sleep(500);
                 Hopper.setPower(0);
-                Intake.setPower(.8);
+                Intake.setPower(.85);
             }
             if (gamepad2.dpad_left) {
                 intakerelease.setPosition(.36);
@@ -199,7 +273,7 @@ public class TELEOP extends LinearOpMode {
                 gripper.setPosition(.65);
             }
             if (gamepad2.dpad_down){
-                Launcher.setVelocity(1000);
+                Launcher.setVelocity(975);
             }
 
             idle();

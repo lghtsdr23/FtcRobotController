@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 @Autonomous(name = "RED middlB5")
-
+@Disabled
 public class redmiddle extends LinearOpMode {
 
     // Motor Declaration

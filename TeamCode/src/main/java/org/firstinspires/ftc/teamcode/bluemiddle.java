@@ -126,8 +126,10 @@ public class bluemiddle extends LinearOpMode {
 
         if (opModeIsActive()) {
             straightDriveEncoder(.8, 25, 2);
-            Hopper.setPower(-.45);
-            Launcher.setVelocity(1175);
+            Hopper.setPower(-.65);
+            sleep(900);
+            Hopper.setPower(-0.1);
+            Launcher.setVelocity(1100);
 
 
             while (t < 4 && opModeIsActive()&& !isStopRequested()) {
@@ -163,20 +165,18 @@ public class bluemiddle extends LinearOpMode {
                     strafeDriveEncoder(0.7, 25, "RIGHT", 2.0);
                 }// First strafe after detection
                 if (!isStopRequested() && opModeIsActive()) {
-                    straightDriveEncoder(0.8, 145, 2.6);
+                    straightDriveEncoder(0.7, 145, 2.6);
                     /*   1/21/2021 GL changed time to 2.7 from 2.8
                      */
                 }
                 if (!isStopRequested() && opModeIsActive()) {
-                    strafeDriveEncoder(.5, 50, "LEFT", 2.0);
+                    strafeDriveEncoder(.5, 47, "LEFT", 2.0);
                 }
 
                 if (opModeIsActive()){
-                    Wobble.setPower(-0.3);
+                    Wobble.setPower(-0.4);
                 }
-                if (opModeIsActive()){
-                    sleep(500);
-                }
+
                 if (opModeIsActive()){
                     LoaderShoot();
                 }
@@ -186,9 +186,14 @@ public class bluemiddle extends LinearOpMode {
                 if(opModeIsActive()){
                     LoaderShoot();
                 }
+                if(opModeIsActive()){
+                    LoaderShoot();
+                }
 
                 if (opModeIsActive()){
                     WobbleUp();
+                    Hopper.setPower(.75);
+                    sleep(900);
                     Hopper.setPower(0);
                 }
 
@@ -200,54 +205,53 @@ public class bluemiddle extends LinearOpMode {
                         if (!isStopRequested() && opModeIsActive()) {
                             telemetry.addLine("Quad");
                            if (opModeIsActive()){
+                               intakerelease.setPosition(.4);
                                turnEncoder(0.5,156,"CC");
                            }
+
                             if (opModeIsActive()) {
-                                intakerelease.setPosition(.4);
-                                sleep(1200);
+                                Intake.setPower(.9);
                             }
                             if (opModeIsActive()) {
-                                Intake.setPower(.8);
-                            }
-                            if (opModeIsActive()) {
-                                straightDriveEncoder(.5, 40, 1.5);
+                                straightDriveEncoder(.2, 42, 1.2);
                             }
 
 
                             if (opModeIsActive()) {
-                                straightDriveEncoder(.8, -35, .5);
+                                straightDriveEncoder(.9, -35, .3);
+                            }
+
+                            if (opModeIsActive()){
+                                turnEncoder(0.5,154,"C");
+                                Hopper.setPower(-.75);
+                                sleep(700);
+                                Hopper.setPower(-0.07);
                             }
                             if (opModeIsActive()){
-                                turnEncoder(0.5,156,"C");
+                                Wobble.setPower(-0.4);
                             }
+
                             if (opModeIsActive()){
-                                Wobble.setPower(-0.3);
-                            }
-                            if (opModeIsActive()){
-                                Hopper.setPower(-.65);
-                                sleep(400);
+                                LoaderShoot();
                             }
                             if (opModeIsActive()){
                                 LoaderShoot();
                             }
-                            if (opModeIsActive()){
-                                LoaderShoot();
-                            }
-                            if(opModeIsActive()){
-                                LoaderShoot();
-                            }
+
                             Launcher.setPower(0);
 
-                            if (opModeIsActive()){
-                                turnEncoder(0.5,66,"C");
+
+                            if (opModeIsActive()) {
+                                straightDriveEncoder(.9, 80, 1);
                             }
+
                             if (opModeIsActive()){
-                                Wobble.setPower(-0.3);
-                                sleep(1200);
+
                                 gripper.setPosition(.46);
+                                sleep(1100);
                             }
                             if (opModeIsActive()) {
-                                straightDriveEncoder(.9, -30, 1.0);
+                                straightDriveEncoder(.9, -73su, 1.0);
                             }
 
 
@@ -274,12 +278,17 @@ public class bluemiddle extends LinearOpMode {
                             if (opModeIsActive()) {
                                 Wobble.setPower(-.4);
                                 intakerelease.setPosition(.4);
+
+
+
                                 sleep(600);
                                 gripper.setPosition(.46);
-                                Intake.setPower(.8);
+                                Intake.setPower(.9);
+
                             }
                             if (opModeIsActive()){
                                 turnEncoder(0.8,237,"CC");
+
                             }
 
 
@@ -296,16 +305,21 @@ public class bluemiddle extends LinearOpMode {
 
                             if (opModeIsActive()) {
                                 straightDriveEncoder(.8, -35, .2);
-                                Hopper.setPower(-.65);
+
                             }
                             if (opModeIsActive()){
                                 turnEncoder(0.7,156,"C");
-
+                                Hopper.setPower(-.65);
+                                sleep(1200);
+                                Hopper.setPower(-0.05);
                             }
                             if (opModeIsActive()){
                                 Wobble.setPower(-0.3);
                             }
 
+                            if (opModeIsActive()){
+                                LoaderShoot();
+                            }
                             if (opModeIsActive()){
                                 LoaderShoot();
                             }
@@ -331,21 +345,52 @@ public class bluemiddle extends LinearOpMode {
                     case "default":
                         if (!isStopRequested() && opModeIsActive()) {
                             telemetry.addLine("Default");
+
+                            if (!isStopRequested() && opModeIsActive()) {
+                                strafeDriveEncoder(.8, 27, "LEFT", .3);
+                            }
                             if (opModeIsActive()) {
-                                strafeDriveEncoder(.5, 25, "LEFT", 2.1);
+                                Wobble.setPower(-.4);
+                                sleep(800);
+                                gripper.setPosition(.46);
+                                sleep(800);
+                            }
+                            if (opModeIsActive()) {
+                                straightDriveEncoder(.8, -10,  1);
+                            }
+                            if (opModeIsActive()) {
+                                strafeDriveEncoder(.8, 35, "RIGHT", 2.1);
+                            }
+                            if (opModeIsActive()) {
+                                straightDriveEncoder(.8, -160,  3);
+                            }
+                            if (opModeIsActive()) {
+                                strafeDriveEncoder(.8, 23, "LEFT", 1.1);
                             }
 
-
                             if (opModeIsActive()) {
-                                Wobble.setPower(-.2);
-                                sleep(2000);
-                                gripper.setPosition(.46);
-                                sleep(1500);
+                                straightDriveEncoder(.8, 16,  .5);
                             }
                             if (opModeIsActive()){
-                                turnEncoder(0.6,228,"CC");
+                                gripper.setPosition(.97);
+                                sleep(800);
+                                WobbleUp();
+                            }
+                            if (opModeIsActive()) {
+                                straightDriveEncoder(.9, 175,  3);
+                            }
+                            if (opModeIsActive()) {
+                                strafeDriveEncoder(.8, 13, "LEFT", 1.1);
+                            }
+                            if (opModeIsActive()) {
+                                Wobble.setPower(-.5);
+
+                                gripper.setPosition(.46);
+
                             }
 
+
+                            intakerelease.setPosition(.4);
                             break;
                         }
                         break;
@@ -568,14 +613,14 @@ public class bluemiddle extends LinearOpMode {
     }
     public void WobbleUp(){
         Wobble.setPower(.85);
-        sleep(723);
+        sleep(623);
         Wobble.setPower(0.14);
     }
     public void LoaderShoot(){
-        Loader.setPosition(.65);
-        sleep(434);
+        Loader.setPosition(.68);
+        sleep(404);
         Loader.setPosition(.96);
-        sleep(400);
+        sleep(600);
     }
     private void initVuforia() {
         /*

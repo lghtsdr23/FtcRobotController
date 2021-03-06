@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 @Autonomous(name = "REDWALL")
-
+@Disabled
 public class redwall extends LinearOpMode {
 
     // Motor Declaration
